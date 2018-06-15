@@ -1,0 +1,51 @@
+#!/bin/bash
+
+awk '$5=="BUSY"||$5=="FAULT"||$5=="BLOCK"||$5=="OFFLINE"||$5=="MAINTAIN"||$5=="TEST"||$5=="LOCKED"{system("mysql  -uroot -proot Log -e \"Update Loginfo Set State='\''"$5"'\'',''Time='"now()"' where Dn='\''"$2"'\''and State<>'\''"$5"'\'';\"")}' session.log
+
+#awk '$5=="BUSY"||$5=="FAULT"||$5=="BLOCK"||$5=="OFFLINE"||$5=="MAINTAIN"||$5=="TEST"||$5=="LOCKED"{system("mysql  -uroot -proot Log -e \"insert into Loginfo values('\''"$1"'\'','\''"$2"'\'','\''"$5"'\'','"now()"');\"")}' session.log
+
+#mysql  -uroot -proot Log -e "select * from Loginfo;"
+
+
+
+#awk '$1~/[0-9]/ && $2~/[0-9]/ {print $0 }' session.log
+
+#awk 'FNR==NR{a[$2]=$3;next} !(a[$2]==$3){if(!a[$2]) {print $1,$2,"IDLE",$3>>"change.log"}}' pre.log post.log 
+
+
+#awk 'FNR==NR{a[$2]=$3;next} !(a[$2]==$3){if(a[$2]) {print $1,$2,$3,a[$2]>>"change.log"} else {print $1,$2,$3,"IDLE">>"change.log"}}' post.log pre.log
+
+
+
+
+#./client 127.0.0.1
+
+#rm -rf change.log
+#awk '{print $1,$2,$3 > "post.log"}' pre.log
+
+
+
+
+=======================================================================================================================================================================
+#!/bin/bash
+
+data="session.log"
+
+awk '{if($5=="BUSY"||$5=="FAULT"||$5=="BLOCK"||$5=="OFFLINE"||$5=="MAINTAIN"||$5=="TEST"||$5=="LOCKED"){print $1,$2,$3,$4,$5,$6;print $1,$2,$3,$4,$5,$6>"pre.log"}}' $data
+
+awk 'FNR==NR{a[$2]=$5;next} !(a[$2]==$5){if(a[$2]) {print $1,$2,$3,a[$2];system("mysql  -uroot -proot Log -e \"insert into LogChange values('\''"$1"'\'','\''"$2"'\'','\''"$3"'\'','\''"$4"'\'','\''"$5"'\'','\''"a[$2]"'\'','\''"$6"'\'','"now()"');\"")} else {print $1,$2,$3,"IDLE";system("mysql  -uroot -proot Log -e \"insert into LogChange values('\''"$1"'\'','\''"$2"'\'','\''"$3"'\'','\''"$4"'\'','\''"$5"'\'','"'IDLE'"','\''"$6"'\'','"now()"');\"")}}' post.log pre.log
+
+awk '{print $1,$2,$3,$4,$5,$6 > "post.log"}' pre.log
+
+========================================================================================================================================================================
+#!/bin/bash
+
+data="./log/session.log"
+
+awk '{if($5=="BUSY"||$5=="FAULT"||$5=="BLOCK"||$5=="OFFLINE"||$5=="MAINTAIN"||$5=="TEST"||$5=="LOCKED"){print $1,$2,$3,$4,$5,$6>"pre.log"}}' $data
+
+awk 'FNR==NR{a[$2]=$5;next} !(a[$2]==$5){if(!a[$2]) {print $1,$2,"IDLE",$5;system("mysql  -uroot -proot Log -e \"insert into LogChange values('\''"$1"'\'','\''"$2"'\'','\''"$3"'\'','\''"$4"'\'','"'IDLE'"','\''"$5"'\'','\''"$6"'\'','"now()"');\"")}}' pre.log post.log 
+
+awk 'FNR==NR{a[$2]=$5;next} !(a[$2]==$5){if(a[$2]) {print $1,$2,$5,a[$2];system("mysql  -uroot -proot Log -e \"insert into LogChange values('\''"$1"'\'','\''"$2"'\'','\''"$3"'\'','\''"$4"'\'','\''"$5"'\'','\''"a[$2]"'\'','\''"$6"'\'','"now()"');\"")} else {print $1,$2,$5,"IDLE";system("mysql  -uroot -proot Log -e \"insert into LogChange values('\''"$1"'\'','\''"$2"'\'','\''"$3"'\'','\''"$4"'\'','\''"$5"'\'','"'IDLE'"','\''"$6"'\'','"now()"');\"")}}' post.log pre.log
+
+awk '{print $1,$2,$3,$4,$5,$6 > "post.log"}' pre.log
